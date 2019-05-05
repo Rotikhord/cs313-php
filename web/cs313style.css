@@ -1,0 +1,163 @@
+@import url('https://fonts.googleapis.com/css?family=Carrois+Gothic+SC|Electrolize|Kelly+Slab|Share+Tech+Mono');
+body {
+ display: flex;
+ flex-direction: column;
+ font-family: 'Electrolize', sans-serif;
+ color: #66FCF1;
+ background-image: linear-gradient(to right, #66fcf1, #5de5dc, #55cec7, #4db8b2, #45a29e);
+}
+#header, #contentArea {
+  display: flex;
+  flex-direction: column;
+  margin: 1rem;
+  min-height: 10rem;
+  background-image: linear-gradient(to top, #0256a8, #004a90, #003e79, #003262, #02274c);
+  padding: 1rem;
+  border-radius: 10px;
+  margin-top: .5rem;
+  margin-bottom: .5rem;
+}
+.titleArea{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#pageTitle{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+h2 {
+  text-align: center;
+}
+#pageTitle h1, #pageTitle h2{
+  margin: 0;
+}
+#pageTitle h5 {
+  font-size: 1rem;
+}
+
+#mainMenu {
+  margin: .5rem;
+  background-color: #45A29E;
+  display: flex;
+  flex-direction: column;
+  padding: .5rem;
+  padding-bottom: 0;
+  border-radius: 10px;
+  align-items: center;
+}
+
+.mainMenuItem, .link {
+  margin: .5rem;
+  margin-top: 0;
+  background-color: #05386B;
+  color: #66FCF1;
+  min-height: 2rem;
+  padding: .5rem;
+  border-radius: 10px;
+  align-content: center;
+  max-width: 500px;
+  width: 90%;
+  border: 1px solid #5CDB95;
+  text-align: center;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 150%;
+  transition-duration: .5s;
+}
+.mainMenuItem:hover, .link:hover{
+  color: #05386B;
+  background-color: #5CDB95;
+  border-color: #05386B;
+}
+
+.leftDiv {
+  flex-direction: column;
+  background-image: linear-gradient(to bottom, #0256a8, #004a90, #003e79, #003262, #02274c);
+  width: 100%;
+  margin-bottom: 1rem;
+  border-radius: 1rem;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.image{
+  width: 100%;
+  border-radius: 1rem;
+}
+
+.imgText{
+  display: block;
+  text-align: center;
+  margin-top: 0;
+}
+
+.rightDiv {
+  flex-direction: column;
+  background-image: linear-gradient(to bottom, #0256a8, #004a90, #003e79, #003262, #02274c);
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+tr{
+  background-image: linear-gradient(to right, #004a90, #003e79, #003262, #02274c);
+  height: 4rem;
+}
+.isOdd{
+  background-image: linear-gradient(to left, #004a90, #003e79, #003262, #02274c);
+}
+td{
+  border: 1px solid #5CDB95;
+  text-align: center;
+}
+th{
+  border: 2px solid #5CDB95;
+}
+.smallCol{
+  width: 20%;
+}
+.bigCol{
+  width: 40%;
+}
+@media only screen and (min-width: 740px) {
+  #pageTitle{
+    width: 100%;
+  }
+  #mainMenu{
+    flex-direction: row;
+  }
+  .mainMenuItem{
+    width: 100%;
+  }
+  .inputArea {
+    display: flex;
+    flex-direction: row;
+  }
+#contentArea{
+  flex-direction:row;
+}
+
+  .leftDiv {
+    flex-direction: column;
+    background-image: linear-gradient(to bottom, #0256a8, #004a90, #003e79, #003262, #02274c);
+    width: 35%;
+    margin-right: 1rem;
+  }
+
+  .image{
+    width: 100%;
+    border-radius: 1rem;
+  }
+
+  .rightDiv {
+    flex-direction: column;
+    background-image: linear-gradient(to bottom, #0256a8, #004a90, #003e79, #003262, #02274c);
+    width: 100%;
+  }
+}
