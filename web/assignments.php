@@ -46,8 +46,8 @@
 	      </tr>
 	      <tr class="isOdd" onmouseenter="highlight(this)" onmouseleave="highlight(this)">
 	        <td>03</td>
-	        <td>Week 03 Assignment</td>
-	        <td>Coming Soon!</td>
+	        <td>A "Shopping Cart" that allows users to browse and select items for purchase, view their cart and confirm their orders! </td>
+	        <td><a href="week03/browse.php" class="link">Assignment 03</td>
 	      </tr>
 	      <tr onmouseenter="highlight(this)" onmouseleave="highlight(this)">
 	        <td>04</td>

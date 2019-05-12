@@ -1,0 +1,70 @@
+body {
+ display: flex;
+ flex-direction: column;
+ font-family: 'Helvetica', sans-serif;
+ color: #AAF9AA;
+ background-image: linear-gradient(to left, #A44200, #E05D06, #FF6905, #DB732E, #FF934C);
+}
+
+#content{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 1rem;
+  min-height: 10rem;
+  background-image: linear-gradient(to right, #006600, #127512, #2A912A, #3FA33F, #5BBA5B);
+  padding: 1rem;
+  border-radius: 10px;
+  margin-top: .5rem;
+  margin-bottom: .5rem;
+}
+
+#formCard{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 1rem;
+  min-height: 10rem;
+  background-image: linear-gradient(to bottom, #A44200, #E05D06);
+  padding: 1rem;
+  border-radius: 10px;
+  margin-top: .5rem;
+  margin-bottom: .5rem;
+}
+
+form{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+form label{
+  display: block;
+  margin-top: .5rem;
+}
+
+.button {
+  margin-top: 1rem;
+  min-height: 1rem;
+  width: 10rem;
+  text-align: center;
+  text-decoration:none;
+  font-weight: bold;
+  font-size: 1rem;
+  color: black;
+  background-color: #FF934C;
+  padding: .5rem;
+  border-radius: 10px;
+  border: 2px solid #006600;
+  transition: .3s;
+}
+.button:hover {
+  background-color:  #E05D06;
+}
+
+.shipMessage{
+  margin-top: 0;
+  margin-bottom: 0;
+}
+@media only screen and (min-width: 740px) {
+}
