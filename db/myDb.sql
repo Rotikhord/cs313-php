@@ -1,4 +1,3 @@
-Teach04 - Team Assignment text template
 
 CREATE TABLE employee (
 emp_pk          SERIAL NOT NULL PRIMARY KEY,
@@ -35,7 +34,7 @@ job_pk            SERIAL NOT NULL PRIMARY KEY,
 job_number        VARCHAR(10) NOT NULL UNIQUE,
 job_date          DATE NOT NULL,
 job_description   TEXT NOT NULL,
-job_cus_fk        INT NOT NULL REFERENCES public.address(cus_pk),
+job_cus_fk        INT NOT NULL REFERENCES public.customer(cus_pk),
 job_add_fk        INT REFERENCES public.address(add_pk),
 job_balance       REAL NOT NULL,
 job_complete_date DATE
@@ -45,7 +44,7 @@ CREATE TABLE punchlog (
 pun_pk            SERIAL NOT NULL PRIMARY KEY,
 pun_date          DATE NOT NULL,
 pun_description   TEXT NOT NULL,
-pun_job_fk        INT NOT NULL REFERENCES public.address(job_pk),
+pun_job_fk        INT NOT NULL REFERENCES public.job(job_pk),
 pun_complete_date DATE
 );
 
@@ -54,12 +53,12 @@ upd_pk            SERIAL NOT NULL PRIMARY KEY,
 upd_timestamp     TIMESTAMP NOT NULL,
 upd_description   TEXT NOT NULL,
 upd_payment       REAL,
-upd_pun_fk        INT NOT NULL REFERENCES public.address(pun_pk),
-upd_emp_fk        INT NOT NULL REFERENCES public.address(emp_pk)
+upd_pun_fk        INT NOT NULL REFERENCES public.punchlog(pun_pk),
+upd_emp_fk        INT NOT NULL REFERENCES public.employee(emp_pk)
 );
 
 CREATE TABLE assignment (
 asi_pk            SERIAL NOT NULL PRIMARY KEY,
-asi_pun_fk        INT NOT NULL REFERENCES public.address(pun_pk),
-asi_emp_fk        INT NOT NULL REFERENCES public.address(emp_pk)
+asi_pun_fk        INT NOT NULL REFERENCES public.punchlog(pun_pk),
+asi_emp_fk        INT NOT NULL REFERENCES public.employee(emp_pk)
 );
