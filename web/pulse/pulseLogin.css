@@ -1,0 +1,86 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto+Slab&display=swap');
+body {
+ display: flex;
+ flex-direction: column;
+ font-family: 'Roboto Slab', serif;
+ color: black;
+ background-image: linear-gradient(to bottom, #2C3531, #116466);
+ height: 100%;
+ background-repeat: no-repeat;
+ background-attachment: fixed;
+ align-items: center;
+}
+#header {
+  width: 95%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-image: linear-gradient(to top, #3B945E, #57BA98, #65CCB8, #57BA98, #3B945E);
+  margin: .5rem;
+  min-height: 10rem;
+  border-radius: 10px;
+}
+#logoArea{
+  max-width: 15rem;
+}
+#logoArea img {
+  width: 100%;
+}
+
+#menuArea h2{
+  width: 100%;
+  text-align: center;
+  margin-top: 0;
+}
+
+
+#loginBlock {
+  width: 95%;
+  max-width: 25rem;
+  display: flex;
+  flex-direction: column;
+  margin: .5rem;
+  min-height: 10rem;
+  border-radius: 10px;
+  background-image: linear-gradient(to top, #3B945E, #57BA98, #65CCB8, #57BA98, #3B945E);
+  align-items: center;
+  align-content: center;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+#loginMessageBlock, #loginEmailBlock, #loginPWBlock, #loginButtonBlock{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#loginMessage{
+  width: 100%;
+  text-align: center;
+}
+#contentDetails {
+  grid-column-start: 1;
+  grid-column-end: 13;
+  background-image: linear-gradient(to top, #3B945E, #57BA98, #65CCB8, #57BA98, #3B945E);
+  margin: .5rem;
+  border-radius: 10px;
+  min-height: 10rem;
+}
+label {
+  width: 100%;
+  text-align: center;
+  font-weight:bold;
+}
+
+input, button {
+  width: 80%;
+  max-width: 20rem;
+  font-family: 'Roboto Slab', serif;
+  font-weight:bold;
+  margin-bottom: 1rem;
+  font-size: 16px;
+}
+
+
+@media only screen and (min-width: 740px) {
+}
