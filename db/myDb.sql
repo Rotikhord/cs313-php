@@ -43,7 +43,7 @@ job_complete_date DATE
 CREATE TABLE punchlog (
 pun_pk            SERIAL NOT NULL PRIMARY KEY,
 pun_date          DATE NOT NULL,
-pun_summary	  VARCHAR(255) NOT NULL,
+pun_summary	      VARCHAR(255) NOT NULL,
 pun_description   TEXT NOT NULL,
 pun_job_fk        INT NOT NULL REFERENCES public.job(job_pk),
 pun_last_update   DATE NOT NULL,

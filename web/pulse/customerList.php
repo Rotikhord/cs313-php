@@ -17,17 +17,25 @@
   }
   ?>
 
-  <div id="listHeaderArea">
-    <div id="listSearchArea">
-      <label for="listSearch">Search For:</label>
-      <input id="listSearch" type="text" oninput="searchList(this)">
-    </div>
-    <div id="listFilterArea" >
+  <div id="listArea">
+    <div id='listHeader'>
+      <div id="listSearchArea">
+        <div class='listInputBlock'>
+          <label for="listSearch">Search:</label>
+          <input id="listSearch" type="text" oninput="searchList(this)"><br>
+        </div>
+      </div>
+      <div id="listFilterArea" >
+        <div class='listInputBlock'>
+          <label for="showInactive">Display Inactive:</label>
+          <input id="showInactive" type="checkbox" name="showInactive"><br>
+        </div>
+      </div>
     </div>
     <div id="listTableArea">
       <table>
         <tr id="titleRow">
-          <th colspan="6"> Customers </th>
+          <th colspan="6"><div id='tableTitleDiv'><span id="addNew" onclick='addNew()'>New Customer</span><span id="tableTitle">Customers</span></div></th>
         </tr>
         <tr id="headerRow">
           <th class="sortable" onclick="getSort(1)">Name</th>
@@ -64,7 +72,7 @@
           }
           $query = $db->getDB()->prepare("SELECT cus_pk, COALESCE(cus_company_name, (SELECT cus_contact_lname || ', ' || cus_contact_fname)) AS cus_name,
                   add_street, add_city, add_zip, cus_phone1, cus_email FROM customer
-                  INNER JOIN address ON cus_add_fk = add_pk
+                  LEFT JOIN address ON cus_add_fk = add_pk
                   ORDER BY $orderBy $sortDirection");
           if ($query->execute()){
             $result = $query->fetchAll();

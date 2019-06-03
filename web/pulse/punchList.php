@@ -18,17 +18,37 @@
   }
 
   ?>
-  <div id="listHeaderArea">
-    <div id="listSearchArea">
-      <label for="listSearch">Search For:</label>
-      <input id="listSearch" type="text" oninput="searchList(this)">
-    </div>
-    <div id="listFilterArea" >
+  <div id="listArea">
+    <div id='listHeader'>
+      <div id="listSearchArea">
+        <div class='listInputBlock'>
+          <label for="listSearch">Search:</label>
+          <input id="listSearch" type="text" oninput="searchList(this)"><br>
+        </div>
+        <div class='listInputBlock'>
+          <label for="fromDate">From:</label>
+          <input id="fromDate" type="date" name="fromDate"><br>
+        </div>
+        <div class='listInputBlock'>
+          <label for="toDate">To:</label>
+          <input id="toDate" type="date" name="toDate">
+        </div>
+      </div>
+      <div id="listFilterArea" >
+        <div class='listInputBlock'>
+          <label for="showInactive">Display Inactive:</label>
+          <input id="showInactive" type="checkbox" name="showInactive"><br>
+        </div>
+        <div class='listInputBlock'>
+          <label for="showAssigned">Only Show Assigned:</label>
+          <input id="showAssigned" type="checkbox" name="showAssigned">
+        </div>
+      </div>
     </div>
     <div id="listTableArea">
       <table>
         <tr id="titleRow">
-          <th colspan="6"> Escalated Items </th>
+          <th colspan="6"><div id='tableTitleDiv'><span id="addNew" onclick='addNew()'>Add New Item</span><span id="tableTitle">Escalated Items</span></div></th>
         </tr>
         <tr id="headerRow">
           <th class="sortable" onclick="getSort(1)">Customer</th>

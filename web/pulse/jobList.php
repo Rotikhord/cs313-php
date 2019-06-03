@@ -18,17 +18,25 @@
   }
 
   ?>
-  <div id="listHeaderArea">
-    <div id="listSearchArea">
-      <label for="listSearch">Search For:</label>
-      <input id="listSearch" type="text" oninput="searchList(this)">
-    </div>
-    <div id="listFilterArea" >
+  <div id="listArea">
+    <div id='listHeader'>
+      <div id="listSearchArea">
+        <div class='listInputBlock'>
+          <label for="listSearch">Search:</label>
+          <input id="listSearch" type="text" oninput="searchList(this)"><br>
+        </div>
+      </div>
+      <div id="listFilterArea" >
+        <div class='listInputBlock'>
+          <label for="showInactive">Display Inactive:</label>
+          <input id="showInactive" type="checkbox" name="showInactive"><br>
+        </div>
+      </div>
     </div>
     <div id="listTableArea">
       <table>
         <tr id="titleRow">
-          <th colspan="5"> Open Jobs </th>
+          <th colspan="6"><div id='tableTitleDiv'><span id="addNew" onclick='addNew()'>Add New Job</span><span id="tableTitle">Job List</span></div></th>
         </tr>
         <tr id="headerRow">
           <th class="sortable" onclick="getSort(1)">Customer</th>
