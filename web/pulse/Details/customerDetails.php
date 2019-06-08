@@ -15,11 +15,15 @@
       $checked = "checked";
     }
 
-    //indicates whether this is called within the details section default is false
-    $subDetails = false;
-    if(isset($_GET['subDetails']) && $_GET['subDetails'] == 'true'){
-      $subDetails = true;
-    }
+    //indicates whether this is to be displayed within the details section of a parent record. default is false
+    if(isset($isChildDetails) && $isChildDetails == 'true'){
+      $childDetails = true;
+	  $childDetailStr = 'Child';
+    } else {
+		$isChildDetails = false;
+		$childDetailStr = '';
+	}
+
 
     //connect to the database and make a query
     $db = new Database();
@@ -29,7 +33,13 @@
     $query->execute();
     $result = $query->fetch(PDO::FETCH_ASSOC);
 
-    //Parent info displayed only when not sub-details or not new record
+	if ($result['cus_active'] == 1){
+		$active = 'checked';
+	} else {
+		$active = '';
+	}
+
+    //Parent info displayed only when not child-details or not new record
     if ($record == 0 ){
       echo "<div class='detailInnerBlock'><h4>Add Customer:</h4> </div>";
     }
@@ -38,8 +48,22 @@
             <div class='detailInnerBlock' id='detailOptions'>
               <div class='detailInputBlock'>
                 <label for='showEmpty'>Display Empty Fields:</label><div class='detailBlock' id='customerHeader'>
-                <input id='showEmpty' type='checkbox' name='showEmpty' $checked onclick='getDetails(this)'><br>
-              </div>
+                <input id='showEmpty' type='checkbox' name='showEmpty' $checked onclick='getDetails(this)'><br>";
+
+	//Check if user has high enough permissions
+	if ($_SESSION['permissions'] >= 8) {
+		echo "	<label for='cus_active'>Customer is active?</label>
+                <select id='cus_active' class='editable'><br>";
+		if ($result['cus_active'] == 1){
+			echo "<option value='true' selected='selected'>Active</option>
+				  <option value='false'>Inactive</option>;";
+		} else {
+			echo "<option value='true'>Active</option>
+				  <option value='false' selected='selected'>Inactive</option>";
+		}
+		echo "</select>";
+		}
+	echo "</div>
             </div>
             <div class='detailInnerBlock'>
               <h4> Customer Info:</h4>";
@@ -78,11 +102,23 @@
         //Add different buttons depending on whether this is an add or update action
         if($record != 0){
           //javascript to use ID to note which php file to call.
-          echo "<button id='cus_pk' class='detailButton' value='" . $result['cus_pk'] . "' onclick='update(this)'>Save Changes</button>";
+          echo "<button id='cus_pk' class='detailButton' value='" . $result['cus_pk'] . "' onclick='update$childDetailStr(this)'>Save Changes</button>";
         } else {
-          echo "<button id='cus_pk' class='detailButton' value='0' onclick='update(this)'>Create Record</button>";
+          echo "<button id='cus_pk' class='detailButton' value='0' onclick='update$childDetailStr(this)'>Create Record</button>";
         }
         ?>
         <button class='detailButton' onclick='getDetails(this)'>Cancel</button>
-    </div>
+		</div>
+
+
+	<?php
+	//This is the area for child records 
+	if(!$isChildDetails  && $record != 0){
+		echo "<div class='detailBlock' id='detailChildBlock'>";
+		$parentKey = $result['cus_pk'];
+		include 'Lists/jobList.php';
+		echo "</div>";
+	}
+	?>
+
 </div>

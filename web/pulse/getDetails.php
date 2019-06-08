@@ -4,13 +4,13 @@
     if (isset($_GET["record"])){
 
       if ($_SESSION['displayedList'] == 'Employee'){
-        include 'employeeDetails.php';
+        include 'Details/employeeDetails.php';
       } else if ($_SESSION['displayedList'] == 'Customer'){
-        include 'customerDetails.php';
+        include 'Details/customerDetails.php';
       } else if ($_SESSION['displayedList'] == 'Job') {
-        include 'jobDetails.php';
+        include 'Details/jobDetails.php';
       } else if ($_SESSION['displayedList'] == "PunchList"){
-        include 'punchDetails.php';
+        include 'Details/punchDetails.php';
       } else {
         die();
         }

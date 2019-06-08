@@ -15,11 +15,15 @@
       $checked = "checked";
     }
 
-    //indicates whether this is called within the details section default is false
-    $subDetails = false;
-    if(isset($_GET['subDetails']) && $_GET['subDetails'] == 'true'){
-      $subDetails = true;
-    }
+
+    //indicates whether this is to be displayed within the details section of a parent record. default is false
+    if(isset($isChildDetails) && $isChildDetails == 'true'){
+      $childDetails = true;
+	  $childDetailStr = 'Child';
+    } else {
+		$isChildDetails = false;
+		$childDetailStr = '';
+	}
 
     //connect to the database and make a query
     $db = new Database();
@@ -32,8 +36,8 @@
       $result = $query->fetch(PDO::FETCH_ASSOC);
     }
 
-    //Parent info displayed only when not sub-details or not new record
-    if (!$subDetails && $record != 0 ){
+    //Parent info displayed only when not child-details or not new record
+    if (!$isChildDetails && $record != 0 ){
       //Using 1 echo over multiple lines to improve readablity
       echo "<div class='detailBlock' id='customerHeader'>
               <div class='detailInnerBlock' id='detailOptions'>
@@ -95,7 +99,7 @@
       ?>
   <div class="detailBlock" id="punchHeader">
     <?php
-      if ($record == 0 && !$subDetails){
+      if ($record == 0 && !$isChildDetails){
 
         //Get all active jobs
         $jobQuery = $db->getDB()->prepare("SELECT job_pk, COALESCE(cus_company_name, (SELECT cus_contact_lname || ', ' || cus_contact_fname)) AS cus_name,
@@ -156,11 +160,21 @@
           //Add different buttons depending on whether this is an add or update action
           if($record != 0){
             //javascript to use ID to note which php file to call.
-            echo "<button id='pun_pk' class='detailButton' value='" . $result['pun_pk'] . "' onclick='update(this)'>Save Changes</button>";
+            echo "<button id='pun_pk' class='detailButton' value='" . $result['pun_pk'] . "' onclick='update$childDetailStr(this)'>Save Changes</button>";
           } else {
-            echo "<button id='pun_pk' class='detailButton' value='0' onclick='update(this)'>Create Record</button>";
+            echo "<button id='pun_pk' class='detailButton' value='0' onclick='update$childDetailStr(this)'>Create Record</button>";
           }
           ?>
           <button class='detailButton' onclick='getDetails(this)'>Cancel</button>
       </div>
+
+	<?php
+	//This is the area for child records 
+	if(!$isChildDetails  && $record != 0){
+		echo "<div class='detailBlock' id='detailChildBlock'>";
+		$parentKey = $result['pun_pk'];
+		include 'updateList.php';
+		echo "</div>";
+	}
+	?>
   </div>

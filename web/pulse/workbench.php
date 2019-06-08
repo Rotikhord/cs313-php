@@ -27,17 +27,17 @@
   <?php
     if (isset($_SESSION['displayedList'])){
       if ($_SESSION['displayedList'] == 'Employee'){
-        include 'employeeList.php';
+        include 'Lists/employeeList.php';
       } else if ($_SESSION['displayedList'] == 'Customer'){
-        include 'customerList.php';
+        include 'Lists/customerList.php';
       } else if ($_SESSION['displayedList'] == 'Job'){
-        include 'jobList.php';
+        include 'Lists/jobList.php';
       } else if ($_SESSION['displayedList'] == "PunchList"){
-        include 'punchList.php';
+        include 'Lists/punchList.php';
       }
   } else {
     //Default is punchlist
-    include 'punchList.php';
+    include 'Lists/punchList.php';
   }
   ?>
   </div>

@@ -140,15 +140,15 @@ function update(element){
       loadList("same", selectedColumn);
       document.getElementById('contentDetails').innerHTML = request.responseText;
     }
-  }
-if (element.value != 0){
-  request.open("POST", "updateItem.php" ,  true);
-} else {
-  request.open("POST", "addItem.php" ,  true);
-}
-request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-request.send(requestString);
-}
+    }
+    if (element.value != 0) {
+        request.open("POST", "updateItem.php" ,  true);
+}   else {
+        request.open("POST", "addItem.php" ,  true);
+    }
+    request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    request.send(requestString);
+    }
 
 function checkRequiredFields(element){
   var requiredFields = [];

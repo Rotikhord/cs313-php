@@ -15,11 +15,15 @@
       $checked = "checked";
     }
 
-    //indicates whether this is called within the details section default is false
-    $subDetails = false;
-    if(isset($_GET['subDetails']) && $_GET['subDetails'] == 'true'){
-      $subDetails = true;
-    }
+
+    //indicates whether this is to be displayed within the details section of a parent record. default is false
+    if(isset($isChildDetails) && $isChildDetails == 'true'){
+      $childDetails = true;
+	  $childDetailStr = 'Child';
+    } else {
+		$isChildDetails = false;
+		$childDetailStr = '';
+	}
 
     //connect to the database and make a query
     $db = new Database();
@@ -29,7 +33,7 @@
       $result = $query->fetch(PDO::FETCH_ASSOC);
     }
 
-    //Parent info displayed only when not sub-details or not new record
+    //Parent info displayed only when not child-details or not new record
     if ($record == 0 ){
       echo "<div class='detailInnerBlock'><h4>Add Employee:</h4> </div>";
     }
@@ -77,4 +81,14 @@
         ?>
         <button class='detailButton' onclick='getDetails(this)'>Cancel</button>
     </div>
+
+	<?php
+	//This is the area for child records 
+	if(!$isChildDetails && $record != 0){
+		echo "<div class='detailBlock' id='detailChildBlock'>";
+		$parentKey = $result['emp_pk'];
+		include 'assignmentList.php';
+		echo "</div>";
+	}
+	?>
 </div>
