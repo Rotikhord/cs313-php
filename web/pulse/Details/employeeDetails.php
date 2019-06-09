@@ -21,6 +21,7 @@
       $childDetails = true;
 	  $childDetailStr = 'Child';
     } else {
+		$parentType = 'employee';
 		$isChildDetails = false;
 		$childDetailStr = '';
 	}
@@ -41,7 +42,7 @@
     echo "<div class='detailBlock' id='employeeHeader'>
             <div class='detailInnerBlock' id='detailOptions'>
               <div class='detailInputBlock'>
-                <label for='showEmpty'>Display Empty Fields:</label><div class='detailBlock' id='customerHeader'>
+                <label for='showEmpty'>Display Empty Fields:</label>
                 <input id='showEmpty' type='checkbox' name='showEmpty' $checked onclick='getDetails(this)'><br>
               </div>
             </div>
@@ -67,9 +68,9 @@
     }
 
 
-     echo "</div>";
+     echo "</div></div>";
     ?>
-    <div id="detailButtons" class="detailInnerBlock">
+    <div id="detailButtons" class="detailBlock">
       <?php
         //Add different buttons depending on whether this is an add or update action
         if($record != 0){
@@ -78,8 +79,9 @@
         } else {
           echo "<button id='emp_pk' class='detailButton' value='0' onclick='update(this)'>Create Record</button>";
         }
-        ?>
-        <button class='detailButton' onclick='getDetails(this)'>Cancel</button>
+
+		  echo "<button class='detailButton' onclick='getDetails$childDetailStr(this)'>Cancel</button>";
+		  ?>
     </div>
 
 	<?php
@@ -87,7 +89,7 @@
 	if(!$isChildDetails && $record != 0){
 		echo "<div class='detailBlock' id='detailChildBlock'>";
 		$parentKey = $result['emp_pk'];
-		include 'assignmentList.php';
+		include 'Lists/assignmentList.php';
 		echo "</div>";
 	}
 	?>

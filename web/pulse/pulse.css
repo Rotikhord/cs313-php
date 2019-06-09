@@ -31,7 +31,7 @@ body {
 #userInfoArea{
   display: flex;
   flex-direction: column;
-  justify-content: end;
+  justify-content: flex-end;
   grid-column-start: 5;
   grid-column-end: 9;
   padding: 1rem;
@@ -91,16 +91,16 @@ body {
   border-radius: 10px;
   min-height: 10rem;
 }
-#listArea{
+.listArea{
     width: 100%;
 }
-#listHeader{
+.listHeader{
   display: flex;
   flex-direction: row;
   padding-bottom: 1rem;
 }
-#listSearchArea{
-  width: 50%;
+.listSearchArea{
+  width: 100%;
   max-width: 15rem;
   display: flex;
   flex-direction: column;
@@ -112,15 +112,16 @@ body {
   align-items: center;
   justify-content: flex-end;
 }
-#listSearchArea label{
+.listSearchArea label{
   display: inline-block;
   min-width: 3.5rem;
   text-align: right;
 }
-#listSearchArea input{
+.listSearchArea input{
   width: 100%;
 }
-#listFilterArea label{
+.listFilterArea label{
+   width: 100%;
   text-align: right;
 
 }
@@ -176,9 +177,69 @@ tr:hover{
 }
 
 input {
-  font-family: 'Roboto Slab', serif;
-  font-size: 14px;
+    font-family: 'Roboto Slab', serif;
+    font-size: 14px;
+    background-color: #65CCB8;
 }
 
+#contentDetails {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 1rem;
+}
+
+.detailBlock {
+    background-color: #359C88;
+    box-sizing: border-box;
+    padding: 1rem;
+    border: 1px solid #2C3531;
+    border-radius: .5rem;
+}
+
+.detailInnerBlock input {
+    width: 99%;
+    background-color: #65CCB8;
+}
+.detailInnerBlock textarea {
+    width: 99%;
+    height: 5rem;
+    background-color: #65CCB8;
+}
+
+#detailHeader, #detailButtons, #detailChildBlock {
+    grid-column-start: 1;
+    grid-column-end: 3;
+}
+
+
+#showAssigned, #showInactive, #showEmpty{
+    width: 1rem;
+}
+
+.detailInputBlock{
+    display: flex;
+    flex-direction: row;
+}
+
+#detailButtons{
+    display: flex;
+    flex-direction: row;
+    align-content:space-around;
+}
+
+button {
+    width: 100%;
+    min-width: 10rem;
+    min-height: 2rem;
+    border-radius: .25rem;
+    border: 1px solid black;
+    padding: .2rem;
+    background-color: #258C78;
+    transition-duration: .5s;
+    font-weight: bold;
+}
+    button:hover {
+        background-color: #65CCB8;
+    }
 @media only screen and (min-width: 740px) {
 }

@@ -23,6 +23,7 @@
     } else {
 		$isChildDetails = false;
 		$childDetailStr = '';
+		$parentType = 'punchlog';
 	}
 
     //connect to the database and make a query
@@ -30,22 +31,30 @@
     $query = $db->getDB()->prepare("SELECT * FROM punchlog
             INNER JOIN job ON pun_job_fk = job_pk
             INNER JOIN customer ON job_cus_fk = cus_pk
-            INNER JOIN address ON job_add_fk = add_pk
+            LEFT JOIN address ON job_add_fk = add_pk
             WHERE pun_pk = $record");
     if ($query->execute()){
       $result = $query->fetch(PDO::FETCH_ASSOC);
     }
 
+	if ($isChildDetails){
+		  echo "<div class='detailBlock' id='childHeader'>
+              <div class='detailInnerBlock' id='detailOptions'>
+                  <button class='childHeaderButton' onclick='getChildList(\"Punchlist\")'>Return to List</button>
+                </div>
+              </div>";
+	}
+
     //Parent info displayed only when not child-details or not new record
     if (!$isChildDetails && $record != 0 ){
-      //Using 1 echo over multiple lines to improve readablity
-      echo "<div class='detailBlock' id='customerHeader'>
-              <div class='detailInnerBlock' id='detailOptions'>
+		echo "<div class='detailBlock' id='detailHeader'>
                 <div class='detailInputBlock'>
-                  <label for='showEmpty'>Display Empty Fields:</label><div class='detailBlock' id='customerHeader'>
+                  <label for='showEmpty'>Display Empty Fields:</label>
                   <input id='showEmpty' type='checkbox' name='showEmpty' $checked onclick='getDetails(this)'><br>
                 </div>
-              </div>
+              </div>";
+      //Using 1 echo over multiple lines to improve readablity
+      echo "<div class='detailBlock' id='customerHeader'>
               <div class='detailInnerBlock'>
                 <h4> Customer Info:</h4>";
 
@@ -154,8 +163,8 @@
 
           include "populateDetail.php";
         ?>
-      </div>
-      <div id="detailButtons" class="detailInner Block">
+      </div></div>
+      <div id="detailButtons" class="detailBlock">
         <?php
           //Add different buttons depending on whether this is an add or update action
           if($record != 0){
@@ -164,8 +173,9 @@
           } else {
             echo "<button id='pun_pk' class='detailButton' value='0' onclick='update$childDetailStr(this)'>Create Record</button>";
           }
-          ?>
-          <button class='detailButton' onclick='getDetails(this)'>Cancel</button>
+
+		  echo "<button class='detailButton' onclick='getDetails$childDetailStr(this)'>Cancel</button>";
+		  ?>
       </div>
 
 	<?php
@@ -173,7 +183,7 @@
 	if(!$isChildDetails  && $record != 0){
 		echo "<div class='detailBlock' id='detailChildBlock'>";
 		$parentKey = $result['pun_pk'];
-		include 'updateList.php';
+		include 'Lists/updateList.php';
 		echo "</div>";
 	}
 	?>

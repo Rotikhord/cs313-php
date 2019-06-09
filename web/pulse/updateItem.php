@@ -163,19 +163,38 @@
           }
         }
       }
-      echo "<div class='detailMessageBlock'><h4>Record Updated Successfully!</h4></div>";
-
-      if($punPK != 0){
-        $record = $punPK;
-        include "punchDetails.php";
-      } else if($jobPK != 0) {
-        $record = $jobPK;
-        include "jobDetails.php";
-      } else if($cusPK != 0) {
-        $record = $cusPK;
-        include "customerDetails.php";
-      } else if ($empPK != 0) {
-        $record = $empPK;
-        include "employeeDetails.php";
-      }
+		echo "<div class='detailMessageBlock'><h4>Record Updated Successfully!</h4></div>";
+		if (isset($_POST['isChild']) && $_POST['isChild'] == 'true'){
+			$isChildDetails = 'true';
+			if($punPK != 0){
+				$record = $punPK;
+				$query = $db->getDB()->prepare("SELECT pun_job_fk FROM punchlog WHERE pun_pk = $record");
+				$query->execute();
+				$result = $query->fetch(PDO::FETCH_ASSOC);
+				$parentKey = $result['pun_job_fk'];
+				include "Lists/punchList.php";
+			} else if($jobPK != 0) {
+				$record = $jobPK;
+				$query = $db->getDB()->prepare("SELECT job_cus_fk FROM job WHERE job_pk = $record");
+				$query->execute();
+				$result = $query->fetch(PDO::FETCH_ASSOC);
+				$parentKey = $result['job_cus_fk'];
+				include "Lists/jobList.php";
+			} 
+		} else {
+			$isChildDetails = 'false';
+			if($punPK != 0){
+				$record = $punPK;
+				include "Details/punchDetails.php";
+			} else if($jobPK != 0) {
+				$record = $jobPK;
+				include "Details/jobDetails.php";
+			} else if($cusPK != 0) {
+				$record = $cusPK;
+				include "Details/customerDetails.php";
+			} else if ($empPK != 0) {
+				$record = $empPK;
+				include "Details/employeeDetails.php";
+			}
+		}
  ?>

@@ -1,5 +1,11 @@
 <?php
     session_start();
+	$parentKey = 0;
+	if (isset($_GET['parentKey'])){
+		$parentKey = intval($_GET['parentKey']);
+	} 
+	
+	
     if (isset($_GET["list"])){
       if($_GET["list"] == "Punchlist"){
         include "Lists/punchList.php";

@@ -1,7 +1,7 @@
 <?php
   
   	//Check if this table is being called as a child table
-	if(isset($parentKey)){
+	if(isset($parentKey) && $parentKey != 0){
 		$isChildTable = true;
 		//Add a modifier to active HTML elements for Javascript handling.
 		$modifier = 'Child';
@@ -30,9 +30,9 @@
   }
 
   ?>
-  <div id="listArea">
-    <div id='listHeader'>
-      <div id="listSearchArea">
+  <div class="listArea">
+    <div class='listHeader'>
+      <div class="listSearchArea">
          <div class='listInputBlock'>
 		  <?php 
 		  echo "<label for='listSearch$modifier'>Search:</label>";
@@ -40,7 +40,7 @@
 		  ?>
         </div>
       </div>
-      <div id="listFilterArea" >
+      <div class="listFilterArea" >
         <div class='listInputBlock'>
           <label for="showInactive">Display Inactive:</label>
           <input id="showInactive" type="checkbox" name="showInactive"><br>
@@ -57,7 +57,7 @@
 			$colSpan = 4;
 		}
 		echo "<tr id='titleRow'><th colspan='$colSpan'>
-			<div id='tableTitleDiv'><span id='addNew' onclick='addNew()'>Add New Job</span>
+			<div id='tableTitleDiv'><span id='addNew' onclick='addNew$modifier()'>Add New Job</span>
 			<span id='tableTitle'>Job List</span></div></th>
 			</tr> <tr id='headerRow'>";
 

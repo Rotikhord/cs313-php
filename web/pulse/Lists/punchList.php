@@ -1,10 +1,7 @@
 <?php
 
-
-
-
 	//Check if this table is being called as a child table
-	if(isset($parentKey)){
+	if(isset($parentKey) && $parentKey != 0){
 		$isChildTable = true;
 		//Add a modifier to active HTML elements for Javascript handling.
 		$modifier = 'Child';
@@ -34,25 +31,17 @@
   }
 
   ?>
-  <div id="listArea">
-    <div id='listHeader'>
-      <div id="listSearchArea">
+  <div class="listArea">
+    <div class='listHeader'>
+      <div class="listSearchArea">
         <div class='listInputBlock'>
 		  <?php 
 		  echo "<label for='listSearch$modifier'>Search:</label>";
 		  echo "<input id='listSearch$modifier' type='text' oninput='searchList(this)'><br>";
 		  ?>
-        </div>
-        <div class='listInputBlock'>
-          <label for="fromDate">From:</label>
-          <input id="fromDate" type="date" name="fromDate"><br>
-        </div>
-        <div class='listInputBlock'>
-          <label for="toDate">To:</label>
-          <input id="toDate" type="date" name="toDate">
-        </div>
+        </div>       
       </div>
-      <div id="listFilterArea" >
+      <div class="listFilterArea" >
         <div class='listInputBlock'>
           <label for="showInactive">Display Inactive:</label>
           <input id="showInactive" type="checkbox" name="showInactive"><br>

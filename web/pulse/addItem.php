@@ -3,7 +3,10 @@
 
   require_once 'database.php';
   $db = new Database();
-
+  $isChildDetails = false;
+  if (isset($_POST['isChild']) && $_POST['isChild'] == 'true'){
+  	  $isChildDetails = true;
+  }
 /*******************************************
  * This handles inserts for punchlog table
  *******************************************/
@@ -19,12 +22,17 @@
 
     $query = $db->getDB()->prepare("INSERT INTO punchlog ($dbColumnString, pun_date, pun_last_update)
                                     VALUES ($dbValueString, current_timestamp, current_timestamp)
-                                    RETURNING $pkCol;");
+                                    RETURNING $pkCol, pun_job_fk;");
     if ($query->execute($dbValues)){
-     echo "Record Added Successfully.";
+     echo "Record Added Successfully.";	 
         $result = $query->fetch(PDO::FETCH_ASSOC);
-        $record = $result[$pkCol];
-        include 'punchDetails.php';
+		if(!$isChildDetails){
+			$record = $result[$pkCol];
+			include 'Details/punchDetails.php';
+		} else {
+			$parentKey = $result['pun_job_fk'];
+			include 'Lists/punchList.php';
+		}
     } else {
       echo "There was an error connecting to the database.<br>";
       die();
@@ -45,7 +53,7 @@
 
      $query = $db->getDB()->prepare("INSERT INTO address ($dbColumnString, add_st)
                                      VALUES ($dbValueString, 'NV')
-                                     RETURNING $pkCol;");
+                                     RETURNING $pkCol");
      if ($query->execute($dbValues)){
       echo "Record Added Successfully.";
          $result = $query->fetch(PDO::FETCH_ASSOC);
@@ -65,18 +73,20 @@
 
       //this file will take the above parameters as well as $_POST and create PDO friendly parameters.
       include 'buildInsertParams.php';
-      echo $dbColumnString . '<br>';
-      echo $dbValueString . '<br>';
-      print_r($dbValues);
 
       $query = $db->getDB()->prepare("INSERT INTO $dbTable ($dbColumnString, job_add_fk)
                                       VALUES ($dbValueString, $job_add_fk)
-                                      RETURNING $pkCol");
+                                      RETURNING $pkCol, job_cus_fk");
       if ($query->execute($dbValues)){
        echo "Record Added Successfully.";
           $result = $query->fetch(PDO::FETCH_ASSOC);
-          $record = $result[$pkCol];
-          include 'jobDetails.php';
+          if(!$isChildDetails){
+				$record = $result[$pkCol];						
+				include 'Details/jobDetails.php';
+		  } else {
+				$parentKey = $result['job_cus_fk'];
+				include 'Lists/jobList.php';
+		  }
       } else {
         echo "There was an error connecting to the database.<br>";
         die();
@@ -126,7 +136,7 @@
          echo "Record Added Successfully.";
             $result = $query->fetch(PDO::FETCH_ASSOC);
             $record = $result[$pkCol];
-            include 'customerDetails.php';
+            include 'Details/customerDetails.php';
         } else {
           echo "There was an error connecting to the database.<br>";
           die();
@@ -158,12 +168,75 @@
          echo "Record Added Successfully.";
             $result = $query->fetch(PDO::FETCH_ASSOC);
             $record = $result[$pkCol];
-            include 'employeeDetails.php';
+            include 'Details/employeeDetails.php';
         } else {
           echo "There was an error connecting to the database.<br>";
           print_r($query->errorInfo());
           die();
         }
-      }
+
+		//This handles the adding of updates;
+      } else if (isset($_POST['upd_pk'])){
+			//array stores field names and permission levels required.
+			$updateFields = array('upd_description' => 4, 'upd_payment' => 4, 'upd_pun_fk' => 4);
+			//This stores the pk for the table in question.
+			$pkCol = 'upd_pun_fk';
+			
+			//this file will take the above parameters as well as $_POST and create PDO friendly parameters.
+			include 'buildInsertParams.php';
+			
+			$query = $db->getDB()->prepare("INSERT INTO update ($dbColumnString, upd_timestamp,  upd_emp_fk)
+                                    VALUES ($dbValueString, current_timestamp, " . $_SESSION['user'] . ")
+                                    RETURNING $pkCol;");
+			if ($query->execute($dbValues)){
+				echo "Record Added Successfully.";				
+				$result = $query->fetch(PDO::FETCH_ASSOC);
+				$parentKey = $result[$pkCol]; 
+
+				//If payment was made job balance needs to be updated.
+				if (isset($_POST['upd_payment']) &&  is_numeric($_POST['upd_payment'])){
+					$query = $db->getDB()->prepare("SELECT job_pk, job_balance FROM job 
+							INNER JOIN punchlog on job_pk = pun_job_fk WHERE pun_pk = $parentKey;");
+					$query->execute();
+					$result = $query->fetch(PDO::FETCH_ASSOC);
+					$job_pk = $result['job_pk'];
+					$balance = floatval($result['job_balance']) - floatval($_POST['upd_payment']);
+
+					$query = $db->getDB()->prepare("UPDATE job SET job_balance = $balance WHERE job_pk = $job_pk");
+					$query->execute();
+				} else {
+					echo "There was an error updating job balance. Please update it manually.<br>";
+					die();
+				}
+				include 'Lists/updateList.php';
+			} else {
+				echo "There was an error connecting to the database.<br>";
+				die();
+			}
+	  } else if (isset($_POST['asi_emp_fk']) && isset($_POST['asi_pun_fk'])){
+			//array stores field names and permission levels required.
+			$updateFields = array('asi_emp_fk' => 4, 'asi_pun_fk' => 4, 'upd_pun_fk' => 4);
+			//This stores the pk for the table in question.			
+			//this file will take the above parameters as well as $_POST and create PDO friendly parameters.
+			include 'buildInsertParams.php';
+			
+			$query = $db->getDB()->prepare("INSERT INTO assignment ($dbColumnString)
+                                    VALUES ($dbValueString)");
+			if ($query->execute($dbValues)){
+				echo "Record Added Successfully.";
+				if (isset($_POST['assign_emp_fk'])){
+					$parentKey = intval($_POST['asi_emp_fk']);
+					$parentType = 'employee';
+				} else {
+					$parentKey = intval($_POST['asi_pun_fk']);
+					$parentType = 'punchlog';
+				}
+				include 'Lists/assignmentList.php';
+			} else {
+				echo "There was an error connecting to the database.<br>";
+				die();
+			}
+	  }
+
 
  ?>

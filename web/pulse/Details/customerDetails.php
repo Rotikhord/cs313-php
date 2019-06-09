@@ -47,8 +47,8 @@
     echo "<div class='detailBlock' id='customerHeader'>
             <div class='detailInnerBlock' id='detailOptions'>
               <div class='detailInputBlock'>
-                <label for='showEmpty'>Display Empty Fields:</label><div class='detailBlock' id='customerHeader'>
-                <input id='showEmpty' type='checkbox' name='showEmpty' $checked onclick='getDetails(this)'><br>";
+                <label for='showEmpty'>Display Empty Fields:</label>
+                <input id='showEmpty' type='checkbox' name='showEmpty' $checked onclick='getDetails(this)'><br> </div><div class='detailInputBlock'>";
 
 	//Check if user has high enough permissions
 	if ($_SESSION['permissions'] >= 8) {
@@ -95,9 +95,9 @@
 
     include "populateDetail.php";
 
-    echo "</div></div>";
+    echo "</div></div></div>";
     ?>
-    <div id="detailButtons" class="detailInnerBlock">
+    <div id="detailButtons" class="detailBlock">
       <?php
         //Add different buttons depending on whether this is an add or update action
         if($record != 0){
@@ -106,8 +106,9 @@
         } else {
           echo "<button id='cus_pk' class='detailButton' value='0' onclick='update$childDetailStr(this)'>Create Record</button>";
         }
-        ?>
-        <button class='detailButton' onclick='getDetails(this)'>Cancel</button>
+
+		  echo "<button class='detailButton' onclick='getDetails$childDetailStr(this)'>Cancel</button>";
+		  ?>
 		</div>
 
 

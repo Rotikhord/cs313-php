@@ -2,7 +2,7 @@
   //Remember this is the currently displayed list
   $_SESSION['displayedList'] = 'Employee';
 
-  require_once './database.php';
+  require_once 'database.php';
 
   $sortColumn = 0;
   $sortDirection = "ASC"; //Sort oldest to newest by default
@@ -17,15 +17,15 @@
   }
   ?>
 
-  <div id="listArea">
-    <div id='listHeader'>
-      <div id="listSearchArea">
+  <div class="listArea">
+    <div class='listHeader'>
+      <div class="listSearchArea">
         <div class='listInputBlock'>
           <label for="listSearch">Search:</label>
           <input id="listSearch" type="text" oninput="searchList(this)"><br>
         </div>
       </div>
-      <div id="listFilterArea" >
+      <div class="listFilterArea" >
         <div class='listInputBlock'>
           <label for="showInactive">Display Inactive:</label>
           <input id="showInactive" type="checkbox" name="showInactive"><br>
