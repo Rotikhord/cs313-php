@@ -1,0 +1,484 @@
+<!doctype html>
+
+<html lang="en" onkeydown="getInput()">
+<head>
+  <script>
+    /*These are arbitrary numbers that are a result of setting canvas size to 80%vw */
+    var boardWidth;
+
+    //Sets the amount of blocks that can fit either vertically or horizontally.
+    var blockNumber = 50;
+
+    //The calculated block size values for the game.
+    var blockWidth;
+
+    //Stores the last key pressed.
+    var lastkey;
+
+    //Controls the number of pellets on the field
+    var maxPellets = (blockNumber / 4);
+
+    //Stores the current game object
+    var game;
+
+    //Handles the game engine
+    var gameTick;
+    var baseTick = 250;
+
+    var playerColor = 'red';
+    var pelletColor = 'green';
+    var overrideColor = 'null';
+
+
+
+
+    function Snake() {
+      this.direction = "right";
+      this.blocks = [new GameBlock(blockWidth, blockWidth, blockWidth * parseInt(blockNumber / 2), blockWidth * parseInt(blockNumber / 2), playerColor)];
+      this.getBlocks = function () { return this.blocks; }
+      this.isAlive = true;
+
+      //This function handles collisions with pellets
+      this.handleCollisions = function (pelletList) {
+        for (var i = 0; i < pelletList.length; i++) {
+          if (this.blocks[0].checkCollision(pelletList[i])) {
+            //console.log("length = " + this.blocks.length);
+            this.blocks.push(new GameBlock(blockWidth, blockWidth, pelletList[i].xLoc, pelletList[i].yLoc, playerColor));
+            game.points += (game.level * (game.level + 1) / 2 * 100);
+            console.log("Points = " + game.points);
+            pelletList = pelletList.splice(i, 1);
+            //console.log("length = " + this.blocks.length);
+
+          }
+        }
+      }
+
+      //This function gets the value of the last key press and if necessary updates the snake direction.
+      this.updateDirection = function () {
+        switch (lastkey) {
+          case 39:
+            if (this.direction != 'left') {
+              this.direction = 'right';
+            }
+            break;
+          case 37:
+            if (this.direction != 'right') {
+              this.direction = 'left';
+            }
+            break;
+          case 38:
+            if (this.direction != 'up') {
+              this.direction = 'down';
+            }
+            break;
+          case 40:
+            if (this.direction != 'down') {
+              this.direction = 'up';
+            }
+            break;
+        }
+      }
+
+
+
+      this.updateSnake = function () {
+        //Only update snake if is alive
+        if (this.isAlive) {
+          //This updates the location of each block in the snake except for the "headblock"
+          //Use the same loop to check for self-collisions to save resources.
+          for (var i = this.blocks.length - 1; i > 0; i--) {
+
+            this.blocks[i].xLoc = this.blocks[i - 1].xLoc;
+            this.blocks[i].yLoc = this.blocks[i - 1].yLoc;
+
+            if (i != 1 && this.blocks[0].checkCollision(this.blocks[i])) {
+              this.isAlive = false;
+              break;
+            }
+          }
+          //console.log('blockwidth = ' + blockWidth + "  xloc =" + this.blocks[0].xLoc + " yloc =" + this.blocks[0].yLoc);
+          //Updates the headblock & checks for wall collisions
+          switch (this.direction) {
+            case 'left':
+              if (this.blocks[0].xLoc >= blockWidth * .9) {
+                this.blocks[0].updateLocation(-blockWidth, 0);
+              } else {
+                this.isAlive = false;
+              }
+              break;
+            case 'right':
+              if (this.blocks[0].xLoc <= (blockWidth * (blockNumber - 1.9))) {
+                this.blocks[0].updateLocation(blockWidth, 0);
+              } else {
+                this.isAlive = false;
+              }
+              break;
+            case 'up':
+              if (this.blocks[0].yLoc <= (blockWidth * (blockNumber - 1.9))) {
+                this.blocks[0].updateLocation(0, blockWidth);
+              } else {
+                this.isAlive = false;
+              }
+              break;
+            case 'down':
+              if (this.blocks[0].yLoc >= blockWidth * .9) {
+                this.blocks[0].updateLocation(0, -blockWidth);
+              } else {
+                this.isAlive = false;
+              }
+              break;
+            default:
+          }
+        }
+      }
+    }
+
+    //This is the basic game object.
+    function GameBlock(xSize, ySize, xLoc, yLoc, color) {
+      this.xSize = xSize;
+      this.ySize = ySize,
+        this.xLoc = xLoc;
+      this.yLoc = yLoc;
+      this.color = color;
+      this.isValid
+
+      this.updateLocation = function (xChange, yChange) {
+        this.xLoc = this.xLoc + xChange;
+        this.yLoc = this.yLoc + yChange;
+      }
+
+      this.checkCollision = function (block) {
+        if (this.checkAxisCollision(this.xLoc, block.xLoc) && this.checkAxisCollision(this.yLoc, block.yLoc)) {
+          return true;
+        }
+        else {
+          return false;
+        }
+      }
+
+      this.checkAxisCollision = function (point1, point2) {
+        if (point1 - point2 > (-blockWidth * .25) && point1 - point2 < (blockWidth * .25)) {
+          return true;
+        }
+      }
+    }
+
+    //This is the game object. It can be reset.
+    function Game() {
+
+      this.gameBoard = document.getElementById('gameArena');
+      this.context = this.gameBoard.getContext('2d');
+      this.snake = new Snake();
+      this.pelletList = [];
+      this.points = 0;
+      this.isOver = false;
+      this.isPaused = false;
+      this.level = 1;
+      var parent = this;
+
+
+      //This function acts as the game engine.
+      this.updateGame = function () {
+        clearBoard();
+        this.points++;
+        console.log(this.points);
+        for (var i = 0; i < parent.snake.getBlocks().length; i++) {
+          parent.drawBlock(parent.snake.getBlocks()[i]);
+        }
+
+        parent.snake.updateDirection();
+        parent.snake.updateSnake();
+
+        if (parent.pelletList.length < maxPellets && parseInt(Math.random() * (parent.pelletList.length * 2) + 1) == 1) {
+          parent.pelletList.push(new GameBlock(blockWidth, blockWidth, blockWidth * parseInt(Math.random() * (blockNumber - 1)), blockWidth * parseInt(Math.random() * (blockNumber - 1)), pelletColor));
+        }
+        for (var i = 0; i < parent.pelletList.length; i++) {
+          parent.drawBlock(parent.pelletList[i]);
+        }
+
+        parent.snake.handleCollisions(parent.pelletList);
+        if (!this.snake.isAlive) {
+          this.isOver = true;
+          gameOverAnimation();
+        }
+
+      }
+
+      //This draws each gameblock on the screen.
+      this.drawBlock = function (block) {
+        if (overrideColor != 'null') {
+          parent.context.fillStyle = overrideColor;
+        } else {
+          parent.context.fillStyle = block.color;
+        }
+        parent.context.fillRect(block.xLoc, block.yLoc, block.xSize, block.ySize);
+        parent.context.strokeRect(block.xLoc, block.yLoc, block.xSize, block.ySize);
+      }
+
+      //This resets the game board between frames
+      function clearBoard() {
+        parent.context.clearRect(0, 0, parent.gameBoard.width, parent.gameBoard.height);
+      }
+
+      //Handles the game speed.
+
+
+
+    }
+
+    function newGameAnimation() {
+      var messageDiv = document.getElementsByClassName('messageDiv');
+      if (messageDiv.length != 0) {
+        while (messageDiv[0].firstChild) {
+          messageDiv[0].removeChild(messageDiv[0].firstChild);
+        }
+        messageDiv[0].parentNode.removeChild(messageDiv[0]);
+      }
+    }
+
+    function displayFinalScore() {
+      var messageDiv = document.createElement("div");
+      messageDiv.classList.add('messageDiv');
+      var gameOverMessage = document.createElement("h2");
+      var scoreMessage = document.createElement("h4");
+      gameOverMessage.innerText = "Game Over!";
+      scoreMessage.innerText = "Final Score: " + game.points;
+      messageDiv.appendChild(gameOverMessage);
+      messageDiv.appendChild(scoreMessage);
+      var canvas = document.getElementById('gameArena');
+      canvas.parentNode.insertBefore(messageDiv, canvas);
+    }
+
+    function gameOverAnimation() {
+      setTimeout(function () {
+        //Let the animation run for 1 second before turning off.
+        var canvas = document.getElementById('gameArena');
+        canvas.classList.toggle('gameOver');
+        canvas.style.width = '0px';
+        canvas.style.height = '0px';
+        displayFinalScore();
+      }, 2000);
+      document.getElementById('gameArena').classList.toggle('gameOver');
+      document.getElementById('gameButton').innerText = "Start New Game";
+    }
+
+    function levelUpAnimation() {
+      setTimeout(function () {
+        //Let the animation run for 1 second before turning off.
+        document.getElementById('gameArena').classList.toggle('levelUp');
+        overrideColor = 'null';
+      }, 1500);
+      overrideColor = 'lightgreen'
+      document.getElementById('gameArena').classList.toggle('levelUp');
+    }
+
+    function increaseLevel() {
+      levelUpAnimation();
+      game.level++;
+      console.log("Level " + game.level + " Reached. ");
+      clearInterval(gameTick);
+      gameTick = setInterval(updateGameboard, (baseTick - (game.level * ((baseTick - 30) / 20))));
+      document.getElementById('levelLabel').innerText = "Current Level: " + game.level;
+    }
+
+    function updateGameboard() {
+      if (game != undefined && !game.isOver && !game.isPaused) {
+        game.updateGame();
+        if (game.level != 20 && game.points >= (game.level * game.level * 1000)) {
+          increaseLevel();
+        }
+      }
+    }
+
+    function resizeGameBoard() {
+      canvas = document.getElementById('gameArena');
+      canvas.style.width = '90%';
+      canvas.style.height = canvas.offsetWidth  + "px";
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetWidth;
+      document.getElementById('arenaParent').style.minHeight = canvas.offsetHeight + 'px';
+      console.log(window.getComputedStyle(canvas).width + ", " + window.getComputedStyle(canvas).height);
+      //reset boardvariables.
+      boardWidth = canvas.offsetWidth;
+      blockWidth = boardWidth / blockNumber;
+    }
+
+
+    function loadGame() {
+      if (game == undefined || game.isOver) {
+        setTimeout(function () {
+          game = new Game();
+          clearInterval(gameTick);
+          newGameAnimation();
+          resizeGameBoard();
+          gameTick = setInterval(updateGameboard, baseTick - (game.level * ((baseTick - 30) / 20)));  // Must be a number less than 20. )));
+          document.getElementById('gameButton').innerText = "Pause Game";
+          document.getElementById('levelLabel').innerText = "Current Level: 1";
+        }, 200);
+      } else if (game.isPaused) {
+        game.isPaused = false;
+        document.getElementById('gameButton').innerText = "Pause Game";
+      } else {
+        game.isPaused = true;
+        document.getElementById('gameButton').innerText = "Resume Game";
+      }
+    }
+
+    //This function gets the user keyboard input.
+    function getInput() {
+      lastkey = event.keyCode;
+      if (lastkey == 32) {
+        game.points += 500;
+        // document.getElementById('content').classList.toggle('levelUp');
+        document.getElementById('gameArena').classList.toggle('gameOver');
+      }
+    }
+
+    function setUp() {
+      resizeGameBoard();
+      contentBlocks = document.getElementsByClassName('contentBlock');
+      contentElement = document.getElementById('content');
+      for (var i = 0; i < contentBlocks.length; i++) {
+        contentBlocks[i].style.minHeight = contentBlocks[i].offsetWidth + "px";
+      }
+    }
+
+  </script>
+  <meta charset="utf-8">
+
+  <title>My HTML5 Template</title>
+  <meta name="description" content="The HTML5 Herald">
+  <meta name="author" content="SitePoint">
+
+  <link rel="stylesheet" href="css/styles.css?v=1.0">
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #gameArena {
+      background-color: lightblue;
+      border: 1px solid black;
+    }
+    #arenaParent{
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-content: space-around;
+      align-items: center;
+      text-align: center;
+    }
+   
+    #header {
+      width: 100%;
+      margin-bottom: 1rem;
+      background-color: green;
+      border-radius: .5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #content {
+      display: flex;
+      flex-direction: row;
+      background-color: blueviolet;
+      width: 100%;
+      border-radius: .5rem;
+    }
+
+    .contentBlock {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 50%;
+      background-color: red;
+      margin: 1rem;
+      border-radius: .5rem;
+    }
+
+    #gameTitle, #levelLabel{
+      margin: .5rem;
+    }
+
+    .levelUp {
+      animation-name: levelup;
+      animation-duration: 1.5s;
+    }
+
+    .gameOver {
+      animation-name: gameover;
+      animation-duration: 2s;
+    }
+
+    #gameArena::after {
+      padding-bottom: 100%;
+    }
+
+    /* The animation code */
+    @keyframes levelup {
+      0% {
+        background-color: lightblue;
+      }
+
+      25% {
+        background-color: black;
+      }
+
+      50% {
+        background-color: lightblue;
+      }
+
+      75% {
+        background-color: black;
+      }
+
+      100% {
+        background-color: lightblue;
+      }
+    }
+
+
+    @keyframes gameover {
+
+      75% {
+        background-color: black;
+        width: 50px;
+        height: 50px;
+        transform: rotate(360deg);
+      }
+
+      100% {
+        background-color: black;
+        width: 1px;
+        height: 1px;
+      }
+    }
+  </style>
+
+</head>
+
+<body onload="setUp()" onresize="resizeGameBoard()">
+  <div id="header">
+    <h1>CIT 261 Fluency Evidence</h1>
+  </div>
+  <div id="content">
+
+    <div class="contentBlock">
+      <h3 id="gameTitle">Play Snake!</h3>
+      <p id="levelLabel">Use the ARROW keys to control the snake.</p>
+      <div id="arenaParent">
+        <canvas id='gameArena'></canvas>
+      </div>
+      <button id="gameButton" onclick="loadGame()"> Start Game </button>
+    </div>
+    <div class="contentBlock">
+
+    </div>
+  </div>
+
+
+</body>
+</html>
