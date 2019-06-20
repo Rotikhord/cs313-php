@@ -3,7 +3,8 @@
 <html lang="en" onkeydown="getInput()">
 <head>
   <script>
-   var boardWidth;
+    /*These are arbitrary numbers that are a result of setting canvas size to 80%vw */
+    var boardWidth;
 
     //Sets the amount of blocks that can fit either vertically or horizontally.
     var blockNumber = 50;
@@ -24,12 +25,20 @@
     var gameTick;
     var baseTick = 250;
 
+    //Local highscores
+    var localScores = [];
+    var globalScores = [];
+
     var playerColor = 'red';
     var pelletColor = 'green';
     var overrideColor = 'null';
+    
 
-
-
+    function highScore(name, score, date) {
+      this.name = name;
+      this.score = score;
+      this.date = date.toLocaleDateString("en-US");
+    }
 
     function Snake() {
       this.direction = "right";
@@ -180,7 +189,6 @@
       this.updateGame = function () {
         clearBoard();
         this.points++;
-        console.log(this.points);
         for (var i = 0; i < parent.snake.getBlocks().length; i++) {
           parent.drawBlock(parent.snake.getBlocks()[i]);
         }
@@ -235,15 +243,171 @@
       }
     }
 
+    function isHighScore() {
+      if (localScores.length < 10 || globalScores.length < 10) {
+        return true;
+      } else {
+        for (var i = 0; i < localScores.length; i++) {
+          if (game.points > localScores[i].score) {
+            return true;
+          }
+        }
+        for (var i = 0; i < globalScores.length; i++) {
+          if (game.points > globalScores[i].score) {
+            return true;
+          }
+        }
+      } 
+      return false;
+    }
+
+    function submitScore(element) {
+      var input = document.getElementById('nameInput');
+      var name = input.value;
+      if (name == '') {
+        name = 'Anonymous';
+      }
+      var newScore = new highScore(name, game.points, new Date)
+      if (localScores.length == 0) {
+        localScores.push(newScore);
+      } else {
+        for (var i = 0; i < 10; i++) {
+          if (i >= localScores.length) {
+            localScores.push(newScore);
+            break;
+          }
+          if (newScore.score > localScores[i].score) {
+            localScores.splice(i, 0, newScore);
+            break;
+          }
+          if (localScores.length > 10) {
+            localScores.pop();
+          }
+        }
+      }
+
+      if (globalScores.length == 0) {
+        globalScores.push(newScore);
+      } else {
+        for (var i = 0; i < 10; i++) {
+          console.log(globalScores.length + ' - length');
+          if (i >= globalScores.length) {
+            globalScores.push(newScore);
+            break;
+          }
+          if (newScore.score > globalScores[i].score) {
+            globalScores.splice(i, 0, newScore);
+            break;
+          }
+          if (globalScores.length > 10) {
+            globalScores.pop();
+          }
+        }
+      }
+
+      
+      //input.style.visibility = 'hidden';
+      message = document.createElement('h3');
+      message.innerText = "Score Recorded!"
+      element.parentNode.appendChild(message);
+      element.parentNode.removeChild(input);
+      element.parentNode.removeChild(element);
+
+      saveLocalScores();
+      saveGlobalScores();
+      displayHighScores('local');
+    }
+
+    function saveLocalScores() {
+      localStorage.setItem('localHighScores', JSON.stringify(localScores));
+    }
+
+    function saveGlobalScores() {
+      var request = new XMLHttpRequest();
+      request.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          console.log(request.responseText + 'response recieved');        
+          loadGlobalScores();
+        }
+      }
+      request.open("GET", "saveGlobalScores.php?scores=" + JSON.stringify(globalScores), true);
+      request.send();
+    }
+
+    function loadLocalScores() {
+      if (localStorage.getItem('localHighScores') != null) {
+        localScores = JSON.parse(localStorage.getItem('localHighScores'));
+      }
+    }
+
+    //This function gets global highscores from the server. 
+    function loadGlobalScores() {
+      var request = new XMLHttpRequest();
+      request.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          globalScores = JSON.parse(request.responseText);
+          console.log('globalscores loaded');
+          displayHighScores('global');
+        }
+      }
+      request.open("GET", "highScores.json", true);
+      request.send();
+    }
+
+    function displayHighScores(scoreType) {
+      if (scoreType == 'local') {
+        loadLocalScores();
+        var tempScores = localScores;
+        var elementID = 'localScores';
+        var title = "Local";
+      } else {
+        var tempScores = globalScores;
+        var elementID = 'globalScores';
+        var title = "Global";
+      }
+
+      var localDiv = document.getElementById(elementID);
+      var tableString = "<table><tr><th colspan='4'>" + title + " High Scores</th></tr><tr><th>Rank</th><th>Player</th><th>Score</th><th>Date</th></tr>"
+
+      for (var i = 0; i < tempScores.length; i++) {
+        tableString += "<tr><td>" + (i + 1) + "</td><td>" + tempScores[i].name + "</td><td>" + tempScores[i].score + "</td><td>" + tempScores[i].date + "</td></tr>";
+      }
+      tableString += "</table > "
+
+      localDiv.innerHTML = tableString;
+    }
+
+    function announceHighScore(parent) {
+      var message = document.createElement('h2');
+      var input = document.createElement("input");
+      var button = document.createElement("button");
+      message.innerText = 'High Score!';
+      input.type = 'text';
+      input.placeholder = 'Enter your name!';
+      input.id = 'nameInput';
+      button.addEventListener('click', function () { submitScore(button); });
+      button.innerText = "Submit High Score";
+      parent.appendChild(message);
+      parent.appendChild(input);
+      parent.appendChild(button);
+    }
+
     function displayFinalScore() {
       var messageDiv = document.createElement("div");
       messageDiv.classList.add('messageDiv');
       var gameOverMessage = document.createElement("h2");
-      var scoreMessage = document.createElement("h4");
+      var scoreMessage = document.createElement("h3");
       gameOverMessage.innerText = "Game Over!";
       scoreMessage.innerText = "Final Score: " + game.points;
       messageDiv.appendChild(gameOverMessage);
       messageDiv.appendChild(scoreMessage);
+
+      if (isHighScore()) {
+        announceHighScore(messageDiv);
+      }
+
+      messageDiv.style.display = 'flex';
+      messageDiv.style.flexDirection = 'column';
       var canvas = document.getElementById('gameArena');
       canvas.parentNode.insertBefore(messageDiv, canvas);
     }
@@ -296,7 +460,6 @@
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetWidth;
       document.getElementById('arenaParent').style.minHeight = canvas.offsetHeight + 'px';
-      console.log(window.getComputedStyle(canvas).width + ", " + window.getComputedStyle(canvas).height);
       //reset boardvariables.
       boardWidth = canvas.offsetWidth;
       blockWidth = boardWidth / blockNumber;
@@ -340,7 +503,85 @@
       for (var i = 0; i < contentBlocks.length; i++) {
         contentBlocks[i].style.minHeight = contentBlocks[i].offsetWidth + "px";
       }
+      displayHighScores('local');
+      loadGlobalScores();
     }
+
+    function downloadScores() {
+      if (document.getElementById('swapScoreCard').innerText == 'View Global Scores') {
+        var tempScores = localScores;
+        var filename = 'localScores';
+      } else {
+        var tempScores = globalScores;
+        var filename = 'globalScores';
+      }
+      var download = document.createElement('a');
+      if (document.getElementById('downloadJSON').checked) {
+        download.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(tempScores)));
+        filename += '.json';
+      } else {
+        var text = '';
+        for (var i = 0; i < tempScores.length; i++) {
+          text += "Name:" + tempScores[i].name + ", Score:" + tempScores[i].score + ", Date:" + tempScores[i].date + "\r\n";
+        }
+        download.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        filename += '.txt';
+      }
+
+      download.setAttribute('download', filename);   
+
+      download.style.display = 'none';
+      document.body.appendChild(download);
+
+      download.click();
+
+      document.body.removeChild(download);
+    }
+
+    function swapScoreCard(button) {
+      if (button.innerText == 'View Global Scores') {
+        var visible = document.getElementById("localScores");
+        var invisible = document.getElementById("globalScores");
+        var transformModifier = '';
+      } else {
+        var visible = document.getElementById("globalScores");
+        var invisible = document.getElementById("localScores");
+        var transformModifier = '-';
+      }
+      visible.classList.add('oneSecTransition');
+      invisible.classList.add('oneSecTransition');
+      visible.style.transform = 'rotateY(' + transformModifier + '90deg)';
+      if (button.innerText == 'View Global Scores') {
+        visible.addEventListener("transitionend", showGlobalScores);
+        button.innerText = 'View Local Scores';
+      } else {
+        visible.addEventListener("transitionend", showLocalScores);
+        button.innerText = 'View Global Scores';
+      }
+    }
+
+      function showGlobalScores() {
+        var global = document.getElementById("globalScores");
+        var local = document.getElementById("localScores");
+        local.style.display = 'none';
+        global.style.display = 'block';
+        //A small timeout needed to allow the transistion to propogate effectively.
+        setTimeout(function () {
+          global.style.transform = 'rotateY(0deg)';
+          local.removeEventListener('transitionend', showGlobalScores);  
+        }, 1);
+      }
+
+      function showLocalScores() {
+        var global = document.getElementById("globalScores");
+        var local = document.getElementById("localScores");
+        global.style.display = 'none';
+        local.style.display = 'block';
+        setTimeout(function () {
+          local.style.transform = 'rotateY(0deg)';
+          global.removeEventListener('transitionend', showLocalScores);  
+        }, 1);
+      }
 
   </script>
   <meta charset="utf-8">
@@ -360,16 +601,18 @@
     #gameArena {
       background-color: lightblue;
       border: 1px solid black;
+      max-width: 30rem;
     }
-    #arenaParent{
+    #arenaParent {
       width: 100%;
       display: flex;
       flex-direction: column;
       align-content: space-around;
       align-items: center;
       text-align: center;
+      max-height: 30rem;
     }
-
+   
     #header {
       width: 100%;
       margin-bottom: 1rem;
@@ -412,10 +655,38 @@
       animation-duration: 2s;
     }
 
-    #gameArena::after {
-      padding-bottom: 100%;
+    .messageDiv > * {
+      margin: .5rem;
     }
+    .scoreBlock {
+      width: 92%;
+      margin: 1rem;
+      background-color: coral;
+      border-radius: .5rem;
+      box-sizing: border-box;
 
+    }
+    table {
+      border: 1px solid black;
+      width: 100%;
+    }
+    th {
+      border: 1px solid black;
+    }
+    .oneSecTransition{
+      transition-duration: 1s;
+    }
+    .fadeTransition {
+      transition-duration: 1s;
+      opacity: 0;
+    }
+    .transformTransition{
+      transform: rotateY(180deg);
+    }
+    #globalScores {
+      transform: rotateY(-90deg);
+      display: none;
+    }
     /* The animation code */
     @keyframes levelup {
       0% {
@@ -473,8 +744,21 @@
       </div>
       <button id="gameButton" onclick="loadGame()"> Start Game </button>
     </div>
-    <div class="contentBlock">
 
+    <div class="contentBlock">
+      <div class="scoreBlock" id="localScores">
+
+      </div>
+      <div class="scoreBlock" id="globalScores">
+
+      </div>
+      <div id="downloadBlock">
+        <button onclick="downloadScores()"> Download Scores </button>
+
+        <input type="checkbox" id="downloadJSON" />
+        <label for="downloadJSON">Download as JSON?</label>
+      </div>
+      <button id="swapScoreCard" onclick="swapScoreCard(this)"> View Global Scores </button>
     </div>
   </div>
 
